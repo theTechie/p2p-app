@@ -93,19 +93,28 @@ function promptForPeerSelection(peerList, fileName) {
 }
 
 function downloadFile(peer, fileName) {
-    var ioClient = io('http://' + peer);
+    var ioClient = io('http://' + peer, { 'force new connection': true });
     console.log("connecting to peer : ", 'http://' + peer);
+
     ioClient.on('connect', function () {
         console.log("Connect to required peer for download !");
 
         ioClient.emit('obtain', { fileName: fileName });
     });
 
+    ioClient.on('disconnect', function () {
+        console.log("Download Complete. Disconnecting Peer !");
+    });
+
     ss(ioClient).on('download', function (stream, data) {
-        console.log("downloading data..");
         var filename = path.basename(data.name);
-        console.log("FileName: ", __dirname + '/files/' + filename);
         stream.pipe(fs.createWriteStream(__dirname + '/files/' + filename));
+
+        stream.on('end', function () {
+            console.log("File Downloaded !");
+            ioClient.disconnect();
+            promptForFileName();
+        });
     });
 }
 
@@ -113,7 +122,6 @@ ioServer.on('connect', function (socket) {
     logMessage("Connected to Peer : " + socket.id);
 
     socket.on('obtain', function (response) {
-        console.log("sending / downloading file...");
         var stream = ss.createStream();
         ss(socket).emit('download', stream, { name: response.fileName });
         fs.createReadStream(__dirname + '/files/' + response.fileName).pipe(stream);

@@ -14,20 +14,32 @@ var inquirer = require('inquirer'),
 var argv = require('optimist')
     .usage('Usage: $0 -f [FILES] -p [PORT]')
     .demand(['f', 'p'])
-    .alias('f', 'files')
-    .describe('f', 'Files to register')
+    .alias('f', 'folder')
+    .describe('f', 'Folder with files to register')
     .alias('p', 'port')
     .describe('p', 'Port to run on')
     .argv;
 
-console.log(argv.files);
+var folderName = argv.folder;
 
-socket.on('connect', onConnect);
+var files = [];
+
+fs.readdir(folderName, function (err, list) {
+    if (err) {
+        console.log("Please provide a valid folder name !");
+        process.exit();
+    } else {
+        list.forEach(function (file, i) {
+            files.push(file);
+        });
+
+        socket.on('connect', onConnect);
+    }
+});
 
 function onConnect(message) {
     logMessage("Connected to Index Server !");
-
-    registerPeer(argv.files.split(','), argv.port);
+    registerPeer(files, argv.port);
 }
 
 socket.on('init', function (message) {

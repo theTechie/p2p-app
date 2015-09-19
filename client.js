@@ -93,7 +93,7 @@ function promptForPeerSelection(peerList, fileName) {
 }
 
 function downloadFile(peer, fileName) {
-    var ioClient = io('http://' + peer, { 'force new connection': true });
+    var ioClient = io('http://' + peer, { 'forceNew': true });
     console.log("connecting to peer : ", 'http://' + peer);
 
     ioClient.on('connect', function () {

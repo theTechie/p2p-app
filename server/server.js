@@ -6,14 +6,23 @@ var Server = require('socket.io'),
     HashTable = require('hashtable'),
     hashtable = new HashTable();
 
-var PORT = 3000;
+var argv = require('optimist')
+    .usage('Usage: $0 -p [PORT]')
+    .demand(['p'])
+    .alias('p', 'port')
+    .describe('p', 'Index Server Port')
+    .argv;
+
+var PORT = argv.port;
 
 io.on('connect', function (socket) {
     logMessage("Client Connected : " + socket.handshake.address);
+    
     socket.emit('init', "Welcome to P2P Index Server !");
 
     socket.on('register', function (response) {
         registerPeer(socket.id, response.files, response.ip_port);
+        socket.emit('readyForLookup', "All Files Registered; Ready for Lookup !");
     });
 
     socket.on('lookup', function (response) {
@@ -34,7 +43,7 @@ io.on('connect', function (socket) {
 
 function registerPeer(peerId, files, ip_port) {
     var peerInfo = {};
-    /* This is hardly happen as registering a peer is always 1 time*/
+    /* This will hardly happen as registering a peer is always 1 time*/
     if (hashtable.has(peerId)) {
         peerInfo = hashtable.get(peerId);
     }

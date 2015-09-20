@@ -52,6 +52,10 @@ function testLookup() {
     }
 }
 
+function registerPeer(files, port) {
+    socket.emit('register', { files : files, ip_port: ip.address() + ":" + port });
+}
+
 function lookupFile(fileName) {
     socket.emit('lookup', { fileName : fileName, timestamp: Date.now() });
 }

@@ -72,7 +72,7 @@ var startTime;
 
 socket.on('readyForLookup', function (message) {
     var latency = Date.now() - startTime;
-    console.log("Download Latency : ", latency);
+    console.log("Register Latency : ", latency);
     totalLatency += latency;
 
     logMessage(message);

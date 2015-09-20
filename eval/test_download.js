@@ -68,6 +68,20 @@ function testDownload(fileName) {
     }
 }
 
+function registerPeer(files, port) {
+    socket.emit('register', { files : files, ip_port: ip.address() + ":" + port });
+}
+
+function lookupFile(fileName) {
+    socket.emit('lookup', { fileName : fileName, timestamp: Date.now() });
+}
+
+socket.on('peerList', function (response) {
+    peersToDownloadFrom = response.peerList;
+    console.log("Peer List : ", response.peerList);
+    testDownload(response.fileName);
+});
+
 function downloadFile(peer, fileName) {
     var startTime = Date.now();
     var ioClient = io('http://' + peer, { 'forceNew': true });

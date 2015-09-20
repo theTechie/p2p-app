@@ -4,7 +4,8 @@
 var Server = require('socket.io'),
     io = new Server(),
     HashTable = require('hashtable'),
-    hashtable = new HashTable();
+    hashtable = new HashTable(),
+    ip = require('ip');
 
 var argv = require('optimist')
     .usage('Usage: $0 -p [PORT]')
@@ -31,10 +32,6 @@ io.on('connect', function (socket) {
         socket.emit('peerList', { peerList: peerList, fileName: response.fileName, timestamp: response.timestamp });
     });
 
-    socket.on('event', function (data) {
-        logMessage("Event: " + data);
-    });
-
     socket.on('disconnect', function () {
         deregisterPeer(socket.id);
         logMessage("Client Disconnected ! ");
@@ -52,7 +49,7 @@ function registerPeer(peerId, files, ip_port) {
     peerInfo.ip_port = ip_port;
     hashtable.put(peerId, peerInfo);
 
-    logMessage("Messages Registered : " + hashtable.size());
+    logMessage("HashTable Size : " + hashtable.size());
     files.forEach(function (file, i) {
         console.log("files registered : ", file);
     });
@@ -80,4 +77,4 @@ function logMessage(message) {
 }
 
 io.listen(PORT);
-console.log("Index Server Running at : http://localhost:" + PORT);
+console.log("Index Server Running at : http://" + ip.address() + ":" + PORT);

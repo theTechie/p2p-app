@@ -141,7 +141,7 @@ function downloadFile(peer, fileName) {
 }
 
 ioServer.on('connect', function (socket) {
-    logMessage("Connected to Peer : " + socket.id);
+    logMessage("Connected to Peer : " + socket.handshake.address);
 
     socket.on('obtain', function (response) {
         var stream = ss.createStream();
